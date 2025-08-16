@@ -33,7 +33,7 @@ export default defineConfig({
     },
   },
   // Ensure proper base path for GitHub Pages
-  base: "/biotech-portfolio/",
+  base: "/Portfolio/",
   // Add support for large models and audio files
   assetsInclude: ["**/*.gltf", "**/*.glb", "**/*.mp3", "**/*.ogg", "**/*.wav"],
 });
