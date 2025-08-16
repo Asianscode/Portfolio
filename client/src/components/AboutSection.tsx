@@ -22,9 +22,9 @@ export default function AboutSection() {
             <div className="relative">
               <div className="w-80 h-80 rounded-2xl overflow-hidden border-4 border-cyan-500/30 shadow-2xl shadow-cyan-500/20">
                 <img 
-                  src="/profile.png" 
+                  src={`${import.meta.env.BASE_URL}profile.png`} 
                   alt="Muhammad Eshaan" 
-                  className="w-full h-full object-cover"
+                  className="w-full h-full object-cover" 
                 />
               </div>
               {/* Decorative glow effect */}
