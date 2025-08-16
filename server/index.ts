@@ -1,6 +1,7 @@
 import express, { type Request, Response, NextFunction } from "express";
 import { registerRoutes } from "./routes";
 import { setupVite, serveStatic, log } from "./vite";
+import onFinished from 'on-finished';
 
 const app = express();
 app.use(express.json());
@@ -17,21 +18,22 @@ app.use((req, res, next) => {
     return originalResJson.apply(res, [bodyJson, ...args]);
   };
 
-  res.on("finish", () => {
+  app.use((req, res, next) => {
+  const start = Date.now();
+  let capturedJsonResponse: any;
+
+  onFinished(res, () => {
     const duration = Date.now() - start;
-    if (path.startsWith("/api")) {
-      let logLine = `${req.method} ${path} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
-      }
-
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "…";
-      }
-
+    if (req.path.startsWith('/api')) {
+      let logLine = `${req.method} ${req.path} ${res.statusCode} in ${duration}ms`;
+      if (capturedJsonResponse) logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+      if (logLine.length > 80) logLine = logLine.slice(0, 79) + '…';
       log(logLine);
     }
   });
+
+  next();
+});
 
   next();
 });
@@ -58,12 +60,7 @@ app.use((req, res, next) => {
 
   // ALWAYS serve the app on port 5000
   // this serves both the API and the client
-  const port = 5000;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true,
-  }, () => {
-    log(`serving on port ${port}`);
-  });
+  app.listen(5000, '0.0.0.0', () => {
+  console.log('Server running on http://localhost:5000');
+});
 })();
