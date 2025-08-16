@@ -22,7 +22,7 @@ export default function AboutSection() {
             <div className="relative">
               <div className="w-80 h-80 rounded-2xl overflow-hidden border-4 border-cyan-500/30 shadow-2xl shadow-cyan-500/20">
                 <img 
-                  src={`${import.meta.env.BASE_URL}profile.png`} 
+                  src={"https://asianscode.github.io/Portfolio/profile.png"} 
                   alt="Muhammad Eshaan" 
                   className="w-full h-full object-cover" 
                 />
