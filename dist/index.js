@@ -19,15 +19,14 @@ import { createServer as createViteServer, createLogger } from "vite";
 import { defineConfig } from "vite";
 import react from "@vitejs/plugin-react";
 import path, { dirname } from "path";
-import runtimeErrorOverlay from "@replit/vite-plugin-runtime-error-modal";
 import { fileURLToPath } from "url";
 import glsl from "vite-plugin-glsl";
 var __filename = fileURLToPath(import.meta.url);
 var __dirname = dirname(__filename);
 var vite_config_default = defineConfig({
+  base: "/Portfolio/",
   plugins: [
     react(),
-    runtimeErrorOverlay(),
     glsl()
     // Add GLSL shader support
   ],
@@ -116,6 +115,7 @@ function serveStatic(app2) {
 }
 
 // server/index.ts
+import onFinished from "on-finished";
 var app = express2();
 app.use(express2.json());
 app.use(express2.urlencoded({ extended: false }));
@@ -128,18 +128,19 @@ app.use((req, res, next) => {
     capturedJsonResponse = bodyJson;
     return originalResJson.apply(res, [bodyJson, ...args]);
   };
-  res.on("finish", () => {
-    const duration = Date.now() - start;
-    if (path3.startsWith("/api")) {
-      let logLine = `${req.method} ${path3} ${res.statusCode} in ${duration}ms`;
-      if (capturedJsonResponse) {
-        logLine += ` :: ${JSON.stringify(capturedJsonResponse)}`;
+  app.use((req2, res2, next2) => {
+    const start2 = Date.now();
+    let capturedJsonResponse2;
+    onFinished(res2, () => {
+      const duration = Date.now() - start2;
+      if (req2.path.startsWith("/api")) {
+        let logLine = `${req2.method} ${req2.path} ${res2.statusCode} in ${duration}ms`;
+        if (capturedJsonResponse2) logLine += ` :: ${JSON.stringify(capturedJsonResponse2)}`;
+        if (logLine.length > 80) logLine = logLine.slice(0, 79) + "\u2026";
+        log(logLine);
       }
-      if (logLine.length > 80) {
-        logLine = logLine.slice(0, 79) + "\u2026";
-      }
-      log(logLine);
-    }
+    });
+    next2();
   });
   next();
 });
@@ -156,12 +157,7 @@ app.use((req, res, next) => {
   } else {
     serveStatic(app);
   }
-  const port = 5e3;
-  server.listen({
-    port,
-    host: "0.0.0.0",
-    reusePort: true
-  }, () => {
-    log(`serving on port ${port}`);
+  app.listen(5e3, "0.0.0.0", () => {
+    console.log("Server running on http://localhost:5000");
   });
 })();
